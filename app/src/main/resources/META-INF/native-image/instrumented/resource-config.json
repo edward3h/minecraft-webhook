@@ -1,0 +1,11 @@
+{
+  "resources":{
+  "includes":[
+    {"pattern":"\\Qcom/sun/jna/linux-x86-64/libjnidispatch.so\\E"}, 
+    {"pattern":"\\Qmozilla/public-suffix-list.txt\\E"}, 
+    {"pattern":"\\Qorg/apache/hc/client5/version.properties\\E"}, 
+    {"pattern":"\\Qorg/ethelred/minecraft/webhook/logging.properties\\E"}, 
+    {"pattern":"\\Qorg/slf4j/impl/StaticLoggerBinder.class\\E"}
+  ]},
+  "bundles":[]
+}

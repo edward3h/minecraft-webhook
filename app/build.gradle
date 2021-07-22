@@ -1,0 +1,79 @@
+
+
+plugins {
+	id 'ethelred.java-conventions'
+
+	// Apply the groovy plugin to also add support for Groovy (needed for Spock)
+	id 'groovy'
+
+	// Apply the application plugin to add support for building a CLI application in Java.
+	id 'application'
+
+	id "com.palantir.docker" version "0.27.0"
+}
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(11)
+		vendor = JvmVendorSpec.GRAAL_VM
+	}
+}
+
+version = "0.1"
+
+repositories {
+	// Use Maven Central for resolving dependencies.
+	mavenCentral()
+
+	maven {
+		name = "GitHubPackages"
+		url = uri("https://maven.pkg.github.com/edward3h/ethelred-util-picocli")
+		credentials {
+			username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+			password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
+		}
+	}
+}
+
+dependencies {
+	// Use the latest Groovy version for Spock testing
+	testImplementation 'org.codehaus.groovy:groovy:3.0.7'
+
+	// Use the awesome Spock testing and specification framework even with Java
+	testImplementation 'org.spockframework:spock-core:2.0-M4-groovy-3.0'
+	testImplementation 'junit:junit:4.13.1'
+
+	implementation group: 'com.github.docker-java', name: 'docker-java-core', version: '3.2.10'
+	implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.2.10'
+	implementation 'info.picocli:picocli:4.6.1'
+	annotationProcessor 'info.picocli:picocli-codegen:4.6.1'
+	implementation 'com.google.dagger:dagger:2.37'
+	annotationProcessor 'com.google.dagger:dagger-compiler:2.37'
+
+	implementation 'org.ethelred:util-picocli:0.1.4'
+	runtimeOnly group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.31'
+}
+
+compileJava {
+	options.compilerArgs += [
+		"-Aproject=${project.group}/${project.name}"
+	]
+}
+
+application {
+	// Define the main class for the application.
+	mainClass = 'org.ethelred.minecraft.webhook.App'
+	applicationName = 'mc-webhook'
+}
+
+tasks.named('test') {
+	// Use junit platform for unit tests.
+	useJUnitPlatform()
+}
+
+docker {
+	name 'ghcr.io/edward3h/mc-webhook:latest'
+	dockerfile file('src/docker/Dockerfile.jvm')
+	buildArgs(APP_VERSION: version)
+	files tasks.distTar.outputs
+}

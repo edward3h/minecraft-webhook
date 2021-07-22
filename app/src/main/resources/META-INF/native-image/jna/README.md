@@ -1,0 +1,1 @@
+Config borrowed from https://github.com/amahfouz1/jna-graalvm

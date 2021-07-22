@@ -1,0 +1,7 @@
+FROM ghcr.io/graalvm/graalvm-ce:java11-21.1.0 AS builder
+ARG APP_VERSION
+WORKDIR /
+ADD mc-webhook*.tar /dist/
+ENV PATH=$PATH:/dist/mc-webhook-${APP_VERSION}/bin
+
+ENTRYPOINT ["mc-webhook"]

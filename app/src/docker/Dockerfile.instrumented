@@ -1,0 +1,9 @@
+# Notes: this is not in the automated build. So far I manually built and ran it to generate native image configuration files    
+
+FROM ghcr.io/graalvm/graalvm-ce:java11-21.1.0
+RUN gu install native-image
+
+WORKDIR /
+ADD mc-webhook*.tar /dist/
+ENV JAVA_OPTS="-agentlib:native-image-agent=config-output-dir=/output,config-write-period-secs=60,config-write-initial-delay-secs=15"
+ENTRYPOINT [ "/dist/mc-webhook-0.1/bin/mc-webhook" ]

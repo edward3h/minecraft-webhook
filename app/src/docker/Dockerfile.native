@@ -1,0 +1,26 @@
+# TODO native image build doesn't currently run correctly due to an underlying dependency on JNA for connecting to a unix socket
+#
+
+FROM ghcr.io/graalvm/graalvm-ce:java11-21.1.0 AS builder
+RUN gu install native-image
+
+WORKDIR /
+ADD mc-webhook*.tar /dist/
+
+RUN native-image \
+        --no-fallback \
+        -H:+StaticExecutableWithDynamicLibC \
+        -cp $(find dist -name '*.jar' | xargs | tr ' ' ':') \
+        -H:+PrintClassInitialization \
+        -H:+JNI \
+        --initialize-at-build-time=org.ethelred \
+	--initialize-at-run-time=com.sun.jna \
+        --enable-https \
+        --install-exit-handlers \
+        --verbose \
+        org.ethelred.minecraft.webhook.App \
+        mc-webhook
+
+FROM gcr.io/distroless/base
+COPY --from=builder /mc-webhook /
+ENTRYPOINT ["/mc-webhook"]
