@@ -22,17 +22,7 @@ java {
 version = "0.1"
 
 repositories {
-	// Use Maven Central for resolving dependencies.
 	mavenCentral()
-
-	maven {
-		name = "GitHubPackages"
-		url = uri("https://maven.pkg.github.com/edward3h/ethelred-util-picocli")
-		credentials {
-			username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-			password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
-		}
-	}
 }
 
 dependencies {
