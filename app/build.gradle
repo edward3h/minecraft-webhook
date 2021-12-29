@@ -19,7 +19,7 @@ java {
 	}
 }
 
-version = "0.1"
+version = "0.2"
 
 repositories {
 	mavenCentral()
@@ -27,16 +27,15 @@ repositories {
 
 dependencies {
 	// Use the latest Groovy version for Spock testing
-	testImplementation 'org.codehaus.groovy:groovy:3.0.7'
+	testImplementation 'org.codehaus.groovy:groovy:3.0.8'
 
 	// Use the awesome Spock testing and specification framework even with Java
-	testImplementation 'org.spockframework:spock-core:2.0-M4-groovy-3.0'
-	testImplementation 'junit:junit:4.13.1'
+	testImplementation 'org.spockframework:spock-core:2.0-groovy-3.0'
 
 	implementation group: 'com.github.docker-java', name: 'docker-java-core', version: '3.2.10'
-	implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.2.10'
-	implementation 'info.picocli:picocli:4.6.1'
-	annotationProcessor 'info.picocli:picocli-codegen:4.6.1'
+	implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.2.12'
+	implementation 'info.picocli:picocli:4.6.2'
+	annotationProcessor 'info.picocli:picocli-codegen:4.6.2'
 	implementation 'com.google.dagger:dagger:2.37'
 	annotationProcessor 'com.google.dagger:dagger-compiler:2.37'
 
