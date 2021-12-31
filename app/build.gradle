@@ -70,11 +70,14 @@ tasks.named('test') {
 }
 
 tasks.named("dockerfile") {
-  baseImage = "ghcr.io/graalvm/graalvm-ce:java11-21.3.0"
+	baseImage = "ghcr.io/graalvm/graalvm-ce:java11-21.3.0"
 }
 
 tasks.named("dockerBuild") {
-    images = ["ghcr.io/edward3h/mc-webhook:latest", "ghcr.io/edward3h/mc-webhook:${project.version}"]
+	images = [
+		"ghcr.io/edward3h/mc-webhook:latest",
+		"ghcr.io/edward3h/mc-webhook:${project.version}"
+	]
 }
 //docker {
 //	name 'ghcr.io/edward3h/mc-webhook:latest'

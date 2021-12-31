@@ -9,7 +9,7 @@ public class App {
     public static void main(String[] args) {
         Micronaut
             .build(args)
-                .eagerInitSingletons(true)
+            .eagerInitSingletons(true)
             .mainClass(App.class)
             .defaultEnvironments("dev")
             .start();

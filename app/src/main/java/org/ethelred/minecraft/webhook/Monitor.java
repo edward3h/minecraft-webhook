@@ -2,14 +2,12 @@ package org.ethelred.minecraft.webhook;
 
 import com.github.dockerjava.api.DockerClient;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.annotation.Context;
 import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import jakarta.inject.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
