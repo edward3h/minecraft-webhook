@@ -1,42 +1,46 @@
 package org.ethelred.minecraft.webhook;
 
 import com.github.dockerjava.api.DockerClient;
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.annotation.Context;
+import io.micronaut.scheduling.annotation.Scheduled;
+import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import org.ethelred.minecraft.webhook.ContainerComponent.Factory;
+
+import jakarta.inject.Singleton;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Lists docker containers to check for new/removed ones. Creates Tailers
  */
 @Singleton
-public class Monitor implements Runnable {
+public class Monitor {
 
-    private static final Logger LOGGER = Logger.getLogger(
-        Monitor.class.getName()
-    );
+    private static final Logger LOGGER = LogManager.getLogger(Monitor.class);
 
     private final DockerClient docker;
     private final Collection<String> imageNames;
-    private final Factory containerComponentFactory;
+    private final ApplicationContext applicationContext;
 
     @Inject
     public Monitor(
+        ApplicationContext applicationContext,
         DockerClient docker,
-        Collection<String> imageNames,
-        ContainerComponent.Factory containerComponentFactory
+        Options options
     ) {
+        this.applicationContext = applicationContext;
         this.docker = docker;
-        this.imageNames = imageNames;
-        this.containerComponentFactory = containerComponentFactory;
+        this.imageNames = options.getImageNames();
+        LOGGER.info("Constructed");
     }
 
-    private Map<String, Tailer> tails = new ConcurrentHashMap<>();
+    private final Map<String, Tailer> tails = new ConcurrentHashMap<>();
 
-    public void run() {
+    @Scheduled(fixedRate = "${mc-webhook.options.monitor.rate:1m}")
+    public void checkForContainers() {
         LOGGER.info("Checking for containers");
         docker
             .listContainersCmd()
@@ -47,10 +51,15 @@ public class Monitor implements Runnable {
 
     private void _checkContainer(String containerId) {
         if (!tails.containsKey(containerId)) {
-            LOGGER.info(() -> "Adding container " + containerId);
+            LOGGER.info("Adding container {}", containerId);
             tails.putIfAbsent(
                 containerId,
-                containerComponentFactory.create(containerId).tailer()
+                new Tailer(
+                    docker,
+                    containerId,
+                    () -> onComplete(containerId),
+                    applicationContext.getBean(Sender.class)
+                )
             );
         }
     }

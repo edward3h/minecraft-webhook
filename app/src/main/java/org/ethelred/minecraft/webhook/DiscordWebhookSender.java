@@ -1,9 +1,10 @@
 package org.ethelred.minecraft.webhook;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.*;
 import java.net.http.HttpClient;
 import java.util.Optional;
@@ -12,20 +13,16 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+@Singleton
 public class DiscordWebhookSender implements Sender {
 
     private static final long DEFAULT_DELAY = 3_000;
-    private static final Logger LOGGER = Logger.getLogger(
-        DiscordWebhookSender.class.getName()
+    private static final Logger LOGGER = LogManager.getLogger(
+        DiscordWebhookSender.class
     );
-
-    static {
-        LOGGER.setLevel(Level.FINE);
-    }
 
     private final URI webhook;
     private final HttpClient client;
@@ -33,9 +30,9 @@ public class DiscordWebhookSender implements Sender {
     private final BlockingQueue<String> waiting;
 
     @Inject
-    public DiscordWebhookSender(URL webhook) {
+    public DiscordWebhookSender(Options options) {
         try {
-            this.webhook = webhook.toURI();
+            this.webhook = options.getWebhook().toURI();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -43,11 +40,14 @@ public class DiscordWebhookSender implements Sender {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
         this.waiting = new ArrayBlockingQueue<>(64);
         _scheduleNext(0L);
-        LOGGER.info("DiscordWebhookSender initalized with URL " + this.webhook);
+        LOGGER.info(
+            "DiscordWebhookSender initalized with URL {}",
+            this.webhook
+        );
     }
 
     private void _scheduleNext(long delay) {
-        LOGGER.fine(() -> "_scheduleNext(" + delay + ")");
+        LOGGER.debug("_scheduleNext({})", delay);
         scheduler.schedule(
             () -> {
                 try {
@@ -62,7 +62,7 @@ public class DiscordWebhookSender implements Sender {
     }
 
     private void _sendMessage(String message) {
-        LOGGER.fine(message);
+        LOGGER.debug(message);
         long delay = 0;
         try {
             // this works for Discord, not sure if it's compatible with other systems
@@ -79,7 +79,7 @@ public class DiscordWebhookSender implements Sender {
                 request,
                 HttpResponse.BodyHandlers.ofString()
             );
-            LOGGER.fine(() -> response.body());
+            LOGGER.debug(response::body);
             switch (response.statusCode()) {
                 case 401: // Unauthorized
                 case 403: // Forbidden
@@ -122,13 +122,14 @@ public class DiscordWebhookSender implements Sender {
         }
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private long _delayFromHeaderValue(Optional<String> retryValue) {
         if (retryValue.isPresent()) {
             try {
                 return Long.parseLong(retryValue.get()) * 1000; // header is in seconds
             } catch (NumberFormatException e) {
                 // TODO is date format used in this API?
-                LOGGER.log(Level.FINE, retryValue.get(), e);
+                LOGGER.debug(retryValue.get(), e);
             }
         }
         return DEFAULT_DELAY;
@@ -136,7 +137,8 @@ public class DiscordWebhookSender implements Sender {
 
     @Override
     public void sendMessage(String message) {
-        LOGGER.fine(() -> "sendMessage(" + message.trim() + ")");
+        LOGGER.debug("sendMessage({})", message.trim());
+        //noinspection ResultOfMethodCallIgnored
         waiting.offer(message.trim());
     }
 }

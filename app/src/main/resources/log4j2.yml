@@ -1,0 +1,16 @@
+Configuration:
+  status: warn
+  name: config
+
+  appenders:
+    Console:
+      name: STDOUT
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%d %highlight{%p} %style{%C{1.} [%t] %m}{bold,green}%n"
+
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        ref: STDOUT

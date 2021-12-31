@@ -1,21 +1,37 @@
 package org.ethelred.minecraft.webhook;
 
+import io.micronaut.context.annotation.ConfigurationProperties;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Set;
-import picocli.CommandLine.Option;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
- * Command line options for app
+ * options for app
  */
+@ConfigurationProperties("mc-webhook.options")
 public class Options {
 
-    @Option(
-        names = { "--image-name", "-i" },
-        defaultValue = "itzg/minecraft-bedrock-server"
-    )
-    Set<String> imageNames = new HashSet<>();
+    public Set<String> getImageNames() {
+        return imageNames;
+    }
 
-    @Option(names = { "--webhook-url", "--webhook", "-u" }, required = true)
-    URL webhook;
+    @SuppressWarnings("unused")
+    public void setImageNames(Set<String> imageNames) {
+        this.imageNames = imageNames;
+    }
+
+    public URL getWebhook() {
+        return webhook;
+    }
+
+    public void setWebhook(URL webhook) {
+        this.webhook = webhook;
+    }
+
+    @NotEmpty
+    private Set<String> imageNames = Set.of("itzg/minecraft-bedrock-server");
+
+    @NotNull
+    private URL webhook;
 }
