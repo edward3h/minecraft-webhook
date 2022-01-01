@@ -32,7 +32,7 @@ public class DiscordWebhookSender implements Sender {
     @Inject
     public DiscordWebhookSender(Options options) {
         try {
-            this.webhook = options.getWebhook().toURI();
+            this.webhook = options.getWebhookUrl().toURI();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }

@@ -1,7 +1,11 @@
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
+import io.micronaut.context.annotation.Context;
+import io.micronaut.core.annotation.Introspected;
+
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -9,11 +13,17 @@ import javax.validation.constraints.NotNull;
 /**
  * options for app
  */
-@ConfigurationProperties("mc-webhook.options")
+@Context // ensure options are validated early
+@ConfigurationProperties("mc-webhook")
 public class Options {
 
+    private static final Set<String> DEFAULT_IMAGE_NAMES = Set.of(
+        "itzg/minecraft-bedrock-server"
+    );
+
+    @NotEmpty
     public Set<String> getImageNames() {
-        return imageNames;
+        return imageNames.isEmpty() ? DEFAULT_IMAGE_NAMES : imageNames;
     }
 
     @SuppressWarnings("unused")
@@ -21,17 +31,20 @@ public class Options {
         this.imageNames = imageNames;
     }
 
-    public URL getWebhook() {
+    public void setImageName(String imageName) {
+        this.imageNames.add(imageName);
+    }
+
+    @NotNull(message = "A webhook URL must be provided, for example by specifying the environment variable MC_WEBHOOK_WEBHOOK_URL.")
+    public URL getWebhookUrl() {
         return webhook;
     }
 
-    public void setWebhook(URL webhook) {
+    public void setWebhookUrl(URL webhook) {
         this.webhook = webhook;
     }
 
-    @NotEmpty
-    private Set<String> imageNames = Set.of("itzg/minecraft-bedrock-server");
+    private Set<String> imageNames = new HashSet<>();
 
-    @NotNull
     private URL webhook;
 }
