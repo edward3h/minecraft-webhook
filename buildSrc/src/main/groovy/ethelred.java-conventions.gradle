@@ -22,5 +22,6 @@ spotless {
 }
 
 gitHooks {
-	hooks = ['pre-commit': 'build']
+	hooks = ['pre-commit': 'check']
+    hooksDirectory = file("${project.rootDir}/.git/hooks")
 }

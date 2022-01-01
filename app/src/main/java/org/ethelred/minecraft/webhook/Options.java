@@ -2,8 +2,6 @@ package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Context;
-import io.micronaut.core.annotation.Introspected;
-
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +33,9 @@ public class Options {
         this.imageNames.add(imageName);
     }
 
-    @NotNull(message = "A webhook URL must be provided, for example by specifying the environment variable MC_WEBHOOK_WEBHOOK_URL.")
+    @NotNull(
+        message = "A webhook URL must be provided, for example by specifying the environment variable MC_WEBHOOK_WEBHOOK_URL."
+    )
     public URL getWebhookUrl() {
         return webhook;
     }
