@@ -3,19 +3,17 @@ package org.ethelred.minecraft.webhook;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.model.Frame;
-import java.util.logging.Logger;
+import jakarta.inject.Inject;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * tail container logs
  */
-@ContainerScope
 public class Tailer {
 
-    private static final Logger LOGGER = Logger.getLogger(
-        Tailer.class.getName()
-    );
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private static final Pattern levelName = Pattern.compile("Level Name:(.*)");
     /*
@@ -33,12 +31,12 @@ public class Tailer {
     public Tailer(
         DockerClient docker,
         @ContainerId String containerId,
-        Monitor monitor,
+        Runnable completionCallback,
         Sender sender
     ) {
-        this.completionCallback = () -> monitor.onComplete(containerId);
+        this.completionCallback = completionCallback;
         this.sender = sender;
-        LOGGER.info("Tailer is starting for " + containerId);
+        LOGGER.info("Tailer is starting for {}", containerId);
 
         _initial(docker, containerId);
         _follow(docker, containerId);
@@ -67,7 +65,7 @@ public class Tailer {
             var matcher = levelName.matcher(frame.toString());
             if (matcher.find()) {
                 worldName = matcher.group(1).trim();
-                LOGGER.fine(() -> "Found world name " + worldName);
+                LOGGER.debug("Found world name {}", worldName);
             }
         }
     }

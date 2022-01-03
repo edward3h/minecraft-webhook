@@ -4,13 +4,14 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
-import dagger.Module;
-import dagger.Provides;
+import io.micronaut.context.annotation.Factory;
+import jakarta.inject.Singleton;
 
-@Module
-interface DefaultDocker {
-    @Provides
-    static DockerClient docker() {
+@Factory
+public class DefaultDocker {
+
+    @Singleton
+    public DockerClient docker() {
         var dockerCC = DefaultDockerClientConfig
             .createDefaultConfigBuilder()
             .build();
