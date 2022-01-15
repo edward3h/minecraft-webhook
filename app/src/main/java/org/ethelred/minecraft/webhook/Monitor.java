@@ -37,7 +37,7 @@ public class Monitor {
 
     private final Map<String, Tailer> tails = new ConcurrentHashMap<>();
 
-    @Scheduled(fixedRate = "${mc-webhook.options.monitor.rate:1m}")
+    @Scheduled(fixedRate = "${mc-webhook.options.monitor.rate:5s}")
     public void checkForContainers() {
         LOGGER.info("Checking for containers");
         docker
