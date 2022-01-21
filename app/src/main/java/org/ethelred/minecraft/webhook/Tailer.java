@@ -3,6 +3,8 @@ package org.ethelred.minecraft.webhook;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.model.Frame;
+import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Inject;
 import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
@@ -24,19 +26,24 @@ public class Tailer {
         " Player ([^ ]*connected): (.*), xuid"
     );
     private final Runnable completionCallback;
-    private final Sender sender;
+    private final ApplicationEventPublisher<MinecraftServerEvent> eventPublisher;
+    private final String containerId;
+    private final String[] containerNames;
     private volatile String worldName = "Unknown";
 
     @Inject
     public Tailer(
+        ApplicationEventPublisher<MinecraftServerEvent> eventPublisher,
         DockerClient docker,
-        @ContainerId String containerId,
-        Runnable completionCallback,
-        Sender sender
+        @Parameter String containerId,
+        @Parameter String[] containerNames,
+        @Parameter Runnable completionCallback
     ) {
+        this.eventPublisher = eventPublisher;
         this.completionCallback = completionCallback;
-        this.sender = sender;
-        LOGGER.info("Tailer is starting for {}", containerId);
+        this.containerId = containerId;
+        this.containerNames = containerNames;
+        LOGGER.info("Tailer is starting for {}", containerNames);
 
         _initial(docker, containerId);
         _follow(docker, containerId);
@@ -66,6 +73,15 @@ public class Tailer {
             if (matcher.find()) {
                 worldName = matcher.group(1).trim();
                 LOGGER.debug("Found world name {}", worldName);
+                eventPublisher.publishEventAsync(
+                    new MinecraftServerEvent(
+                        MinecraftServerEvent.Type.SERVER_STARTED,
+                        containerId,
+                        containerNames,
+                        worldName,
+                        null
+                    )
+                );
             }
         }
     }
@@ -78,12 +94,15 @@ public class Tailer {
             if (matcher.find()) {
                 var connect = "connected".equals(matcher.group(1));
                 var player = matcher.group(2).trim();
-                sender.sendMessage(
-                    String.format(
-                        "%s %s %s%n",
-                        player,
-                        connect ? "connected to" : "disconnected from",
-                        worldName
+                eventPublisher.publishEventAsync(
+                    new MinecraftServerEvent(
+                        connect
+                            ? MinecraftServerEvent.Type.PLAYER_CONNECTED
+                            : MinecraftServerEvent.Type.PLAYER_DISCONNECTED,
+                        containerId,
+                        containerNames,
+                        worldName,
+                        player
                     )
                 );
             }
@@ -91,6 +110,15 @@ public class Tailer {
 
         @Override
         public void onComplete() {
+            eventPublisher.publishEventAsync(
+                new MinecraftServerEvent(
+                    MinecraftServerEvent.Type.SERVER_STOPPED,
+                    containerId,
+                    containerNames,
+                    worldName,
+                    null
+                )
+            );
             completionCallback.run();
         }
     }

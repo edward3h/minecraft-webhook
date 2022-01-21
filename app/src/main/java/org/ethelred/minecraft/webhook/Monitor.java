@@ -1,10 +1,12 @@
 package org.ethelred.minecraft.webhook;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.model.Container;
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.annotation.Context;
 import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,13 +16,14 @@ import org.apache.logging.log4j.Logger;
 /**
  * Lists docker containers to check for new/removed ones. Creates Tailers
  */
-@Singleton
+@Context
 public class Monitor {
 
     private static final Logger LOGGER = LogManager.getLogger(Monitor.class);
 
     private final DockerClient docker;
     private final Collection<String> imageNames;
+    private final Instant startTime;
     private final ApplicationContext applicationContext;
 
     @Inject
@@ -32,37 +35,39 @@ public class Monitor {
         this.applicationContext = applicationContext;
         this.docker = docker;
         this.imageNames = options.getImageNames();
-        LOGGER.info("Constructed");
+        this.startTime = Instant.now();
+        LOGGER.debug("Constructed");
     }
 
     private final Map<String, Tailer> tails = new ConcurrentHashMap<>();
 
     @Scheduled(fixedRate = "${mc-webhook.options.monitor.rate:5s}")
     public void checkForContainers() {
-        LOGGER.info("Checking for containers");
+        LOGGER.debug("Checking for containers");
         docker
             .listContainersCmd()
             .withAncestorFilter(imageNames)
             .exec()
-            .forEach(c -> _checkContainer(c.getId()));
+            .forEach(this::_checkContainer);
     }
 
-    private void _checkContainer(String containerId) {
+    private void _checkContainer(Container container) {
+        var containerId = container.getId();
         if (!tails.containsKey(containerId)) {
-            LOGGER.info("Adding container {}", containerId);
+            LOGGER.debug("Adding container {}", container);
             tails.putIfAbsent(
                 containerId,
-                new Tailer(
-                    docker,
+                applicationContext.createBean(
+                    Tailer.class,
                     containerId,
-                    () -> onComplete(containerId),
-                    applicationContext.getBean(Sender.class)
+                    container.getNames(),
+                    onComplete(containerId)
                 )
             );
         }
     }
 
-    void onComplete(String containerId) {
-        tails.remove(containerId);
+    private Runnable onComplete(String containerId) {
+        return () -> tails.remove(containerId);
     }
 }

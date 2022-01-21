@@ -1,0 +1,21 @@
+Configuration:
+  status: warn
+  name: config
+
+  appenders:
+    Console:
+      name: STDOUT
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%d %p %C{1.} [%t] %m%n"
+
+  Loggers:
+    logger:
+      - name: io.micronaut
+        level: debug
+      - name: org.ethelred
+        level: debug
+    Root:
+      level: info
+      AppenderRef:
+        ref: STDOUT

@@ -15,6 +15,10 @@ import org.testcontainers.utility.DockerImageName
 import spock.lang.Retry
 import spock.lang.Shared
 import spock.lang.Specification
+
+import java.util.stream.Collectors
+import java.util.stream.Stream
+
 import static org.mockserver.model.HttpRequest.request
 import static org.mockserver.model.HttpResponse.response
 
@@ -46,13 +50,10 @@ class MonitorSpec extends Specification {
         expectation = mockServerClient.when(
                 request().withMethod("POST").withPath("/webhook"))
                 .respond(response().withStatusCode(204))[0]
-        Options options = new Options(
-                imageName: mockBedrock.dockerImageName,
-                webhookUrl: "http://${mockServer.host}:${mockServer.serverPort}/webhook".toURL()
-        )
-
+        
         ApplicationContext applicationContext =ApplicationContext.builder()
-            .singletons(options)
+            .properties("mc-webhook.image-name": mockBedrock.dockerImageName,
+                    "mc-webhook.webhook-url": "http://${mockServer.host}:${mockServer.serverPort}/webhook".toURL())
             .start()
         Monitor monitor = applicationContext.createBean(Monitor)
     }
