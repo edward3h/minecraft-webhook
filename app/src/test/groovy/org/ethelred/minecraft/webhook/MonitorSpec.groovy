@@ -4,6 +4,7 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.context.BeanContext
 import jakarta.inject.Inject
 import org.mockserver.client.MockServerClient
+import org.mockserver.matchers.MatchType
 import org.mockserver.mock.Expectation
 import org.mockserver.model.ExpectationId
 import org.mockserver.verify.VerificationTimes
@@ -21,6 +22,7 @@ import java.util.stream.Stream
 
 import static org.mockserver.model.HttpRequest.request
 import static org.mockserver.model.HttpResponse.response
+import static org.mockserver.model.JsonBody.json
 
 @Testcontainers
 class MonitorSpec extends Specification {
@@ -50,7 +52,7 @@ class MonitorSpec extends Specification {
         expectation = mockServerClient.when(
                 request().withMethod("POST").withPath("/webhook"))
                 .respond(response().withStatusCode(204))[0]
-        
+
         ApplicationContext applicationContext =ApplicationContext.builder()
             .properties("mc-webhook.image-name": mockBedrock.dockerImageName,
                     "mc-webhook.webhook-url": "http://${mockServer.host}:${mockServer.serverPort}/webhook".toURL())
@@ -64,6 +66,10 @@ class MonitorSpec extends Specification {
         writeToBedrock("Player connected: Bob, xuid 12345")
 
         then:
-        mockServerClient.verify( request().withMethod("POST").withPath("/webhook"), VerificationTimes.atLeast(1))
+        mockServerClient.verify(
+                request().withMethod("POST").withPath("/webhook")
+                        .withBody(json("""{
+                      "content" : "Bob connected to MonitorSpec"
+                    }""", MatchType.ONLY_MATCHING_FIELDS)), VerificationTimes.atLeast(1))
     }
 }
