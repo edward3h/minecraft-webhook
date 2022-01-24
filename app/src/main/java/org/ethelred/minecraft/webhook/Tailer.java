@@ -1,3 +1,4 @@
+/* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
 import com.github.dockerjava.api.DockerClient;
@@ -28,7 +29,7 @@ public class Tailer {
     private final Runnable completionCallback;
     private final ApplicationEventPublisher<MinecraftServerEvent> eventPublisher;
     private final String containerId;
-    private final String[] containerNames;
+    private final String containerName;
     private volatile String worldName = "Unknown";
 
     @Inject
@@ -42,8 +43,8 @@ public class Tailer {
         this.eventPublisher = eventPublisher;
         this.completionCallback = completionCallback;
         this.containerId = containerId;
-        this.containerNames = containerNames;
-        LOGGER.info("Tailer is starting for {}", containerNames);
+        this.containerName = String.join(",", containerNames);
+        LOGGER.info("Tailer is starting for {}", containerName);
 
         _initial(docker, containerId);
         _follow(docker, containerId);
@@ -77,7 +78,7 @@ public class Tailer {
                     new MinecraftServerEvent(
                         MinecraftServerEvent.Type.SERVER_STARTED,
                         containerId,
-                        containerNames,
+                        containerName,
                         worldName,
                         null
                     )
@@ -100,7 +101,7 @@ public class Tailer {
                             ? MinecraftServerEvent.Type.PLAYER_CONNECTED
                             : MinecraftServerEvent.Type.PLAYER_DISCONNECTED,
                         containerId,
-                        containerNames,
+                        containerName,
                         worldName,
                         player
                     )
@@ -114,7 +115,7 @@ public class Tailer {
                 new MinecraftServerEvent(
                     MinecraftServerEvent.Type.SERVER_STOPPED,
                     containerId,
-                    containerNames,
+                    containerName,
                     worldName,
                     null
                 )

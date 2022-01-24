@@ -1,3 +1,4 @@
+/* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
 /**

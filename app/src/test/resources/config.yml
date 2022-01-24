@@ -1,7 +1,0 @@
-mc-webhook:
-  imageNames:
-    - poop
-  webhooks:
-    discord1:
-      type: discord
-      url: http://www.example.com

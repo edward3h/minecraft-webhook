@@ -1,9 +1,11 @@
+/* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.BeanContext;
 import io.micronaut.context.annotation.EachBean;
 import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.core.beans.BeanIntrospection;
+import io.micronaut.core.convert.ConversionService;
 import io.micronaut.inject.qualifiers.Qualifiers;
 import io.micronaut.scheduling.annotation.Async;
 import jakarta.inject.Singleton;
@@ -18,13 +20,17 @@ public class MinecraftServerEventListener
     private static final BeanIntrospection<MinecraftServerEvent> eventIntrospection = BeanIntrospection.getIntrospection(
         MinecraftServerEvent.class
     );
+
     private final SenderConfiguration configuration;
     private final Sender sender;
+    private final ConversionService<?> conversionService;
 
     public MinecraftServerEventListener(
         BeanContext beanContext,
+        ConversionService<?> conversionService,
         SenderConfiguration configuration
     ) {
+        this.conversionService = conversionService;
         this.configuration = configuration;
         this.sender =
             beanContext.createBean(
@@ -38,7 +44,12 @@ public class MinecraftServerEventListener
     @Override
     public void onApplicationEvent(MinecraftServerEvent event) {
         if (configuration.getEvents().containsKey(event.getType())) {
-            var substitutor = new StringSubstitutor(_eventLookup(event));
+            var substitutor = new StringSubstitutor(
+                _eventLookup(event),
+                "%",
+                "%",
+                '\\'
+            );
             var messageFormat = configuration.getEvents().get(event.getType());
             var message = substitutor.replace(messageFormat);
             sender.sendMessage(event, message);
@@ -50,7 +61,7 @@ public class MinecraftServerEventListener
             var property = eventIntrospection.getProperty(key);
             return property
                 .map(p -> p.get(event))
-                .map(String::valueOf)
+                .flatMap(o -> conversionService.convert(o, String.class))
                 .orElse(null);
         };
     }

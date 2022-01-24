@@ -1,3 +1,4 @@
+/* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.annotation.EachProperty;
@@ -17,13 +18,13 @@ public class SenderConfiguration {
 
     private Map<MinecraftServerEvent.Type, String> events = Map.of(
         MinecraftServerEvent.Type.SERVER_STARTED,
-        "World ${worldName} starting on ${containerNames}",
+        "World %worldName% starting on %containerName%",
         MinecraftServerEvent.Type.SERVER_STOPPED,
-        "World ${worldName} stopping on ${containerNames}",
+        "World %worldName% stopping on %containerName%",
         MinecraftServerEvent.Type.PLAYER_CONNECTED,
-        "${playerName} connected to ${worldName}",
+        "%playerName% connected to %worldName%",
         MinecraftServerEvent.Type.PLAYER_DISCONNECTED,
-        "${playerName} disconnected from ${worldName}"
+        "%playerName% disconnected from %worldName%"
     );
 
     public String getType() {

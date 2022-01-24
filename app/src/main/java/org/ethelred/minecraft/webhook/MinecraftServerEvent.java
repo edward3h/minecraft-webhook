@@ -1,3 +1,4 @@
+/* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.core.annotation.Introspected;
@@ -10,13 +11,13 @@ public class MinecraftServerEvent {
     public MinecraftServerEvent(
         @NonNull Type type,
         @NonNull String containerId,
-        @NonNull String[] containerNames,
+        @NonNull String containerName,
         @NonNull String worldName,
         @Nullable String playerName
     ) {
         this.type = type;
         this.containerId = containerId;
-        this.containerNames = containerNames;
+        this.containerName = containerName;
         this.worldName = worldName;
         this.playerName = playerName;
     }
@@ -39,8 +40,8 @@ public class MinecraftServerEvent {
     }
 
     @NonNull
-    public String[] getContainerNames() {
-        return containerNames;
+    public String getContainerName() {
+        return containerName;
     }
 
     @NonNull
@@ -60,7 +61,7 @@ public class MinecraftServerEvent {
     private final String containerId;
 
     @NonNull
-    private final String[] containerNames;
+    private final String containerName;
 
     @NonNull
     private final String worldName;

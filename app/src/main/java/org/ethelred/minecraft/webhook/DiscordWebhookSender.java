@@ -1,3 +1,4 @@
+/* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.annotation.Parameter;
@@ -118,8 +119,7 @@ public class DiscordWebhookSender implements Sender {
             }
         } catch (IOException | InterruptedException e) {
             // can't tell at this point whether the message was sent or not - just give up and log
-            System.err.println("Exception in _sendMessage");
-            e.printStackTrace(System.err);
+            LOGGER.error("Exception in _sendMessage", e);
             delay = DEFAULT_DELAY;
         } finally {
             _scheduleNext(delay);
