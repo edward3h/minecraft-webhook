@@ -18,7 +18,7 @@ java {
 	}
 }
 
-version = "0.2"
+version = "0.3"
 
 repositories {
 	mavenCentral()
@@ -80,8 +80,14 @@ tasks.named("dockerfile") {
 }
 
 tasks.named("dockerBuild") {
-	images = [
-		"ghcr.io/edward3h/mc-webhook:latest",
-		"ghcr.io/edward3h/mc-webhook:${project.version}"
-	]
+	if (project.hasProperty("github_ref")) {
+		images = [
+			"ghcr.io/edward3h/mc-webhook:${project.version}-SNAPSHOT-${project.property("github_ref")}"
+		]
+	} else {
+		images = [
+			"ghcr.io/edward3h/mc-webhook:latest",
+			"ghcr.io/edward3h/mc-webhook:${project.version}"
+		]
+	}
 }
