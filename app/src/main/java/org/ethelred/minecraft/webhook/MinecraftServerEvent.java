@@ -12,14 +12,25 @@ public class MinecraftServerEvent {
         @NonNull Type type,
         @NonNull String containerId,
         @NonNull String containerName,
+        @NonNull String worldName
+    ) {
+        this(type, containerId, containerName, worldName, null, null);
+    }
+
+    public MinecraftServerEvent(
+        @NonNull Type type,
+        @NonNull String containerId,
+        @NonNull String containerName,
         @NonNull String worldName,
-        @Nullable String playerName
+        @Nullable String playerName,
+        @Nullable String playerXuid
     ) {
         this.type = type;
         this.containerId = containerId;
         this.containerName = containerName;
         this.worldName = worldName;
         this.playerName = playerName;
+        this.playerXuid = playerXuid;
     }
 
     enum Type {
@@ -54,6 +65,11 @@ public class MinecraftServerEvent {
         return playerName;
     }
 
+    @Nullable
+    public String getPlayerXuid() {
+        return playerXuid;
+    }
+
     @NonNull
     private final Type type;
 
@@ -68,4 +84,7 @@ public class MinecraftServerEvent {
 
     @Nullable
     private final String playerName;
+
+    @Nullable
+    private final String playerXuid;
 }

@@ -61,7 +61,7 @@ mc-webhook:
       type: discord
       url: https://discordapp.com/api/webhooks/[ids from your discord server]
       events:
-        PLAYER_CONNECTED: Hello %playerName%.
+        PLAYER_CONNECTED: Hello %playerName% with id %playerXuid%
         SERVER_STARTED: The world %worldName% is starting on %containerName%
         # only these events will send a message
         # values in %% will be substituted
@@ -77,11 +77,12 @@ These are the current event types:
 Using the `json` type will send a message like:
 ```json
 {
-  "type":"PLAYER_CONNECTED",
-  "containerId":"dd5f449daad5dbd0a3f659bbfabcde47605e1a69211e1f7a9d47b758cc54",
-  "containerName":"/minecraft1",
-  "worldName":"My Level",
-  "playerName":"Steve"
+  "type": "PLAYER_CONNECTED",
+  "containerId": "dd5f449daad5dbd0a3f659bbfabcde47605e1a69211e1f7a9d47b758cc54",
+  "containerName": "/minecraft1",
+  "worldName": "My Level",
+  "playerName": "Steve",
+  "playerXuid": "12345"
 }
 ```
 
@@ -92,6 +93,7 @@ Any of the following will be substituted into the text:
 * %containerName%
 * %worldName%
 * %playerName%
+* %playerXuid%
 
 ### Legacy configuration
 The previous environment variables are still supported, so you don't have to reconfigure from a previous version.

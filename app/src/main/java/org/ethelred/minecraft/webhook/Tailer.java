@@ -24,7 +24,7 @@ public class Tailer {
 [INFO] Player disconnected: Foxer191, xuid: 2535428717109723
     */
     private static final Pattern playerEvent = Pattern.compile(
-        " Player ([^ ]*connected): (.*), xuid"
+        " Player ([^ ]*connected): (.*), xuid: (\\d+)"
     );
     private final Runnable completionCallback;
     private final ApplicationEventPublisher<MinecraftServerEvent> eventPublisher;
@@ -79,8 +79,7 @@ public class Tailer {
                         MinecraftServerEvent.Type.SERVER_STARTED,
                         containerId,
                         containerName,
-                        worldName,
-                        null
+                        worldName
                     )
                 );
             }
@@ -95,6 +94,7 @@ public class Tailer {
             if (matcher.find()) {
                 var connect = "connected".equals(matcher.group(1));
                 var player = matcher.group(2).trim();
+                var xuid = matcher.group(3).trim();
                 eventPublisher.publishEventAsync(
                     new MinecraftServerEvent(
                         connect
@@ -103,7 +103,8 @@ public class Tailer {
                         containerId,
                         containerName,
                         worldName,
-                        player
+                        player,
+                        xuid
                     )
                 );
             }
@@ -116,8 +117,7 @@ public class Tailer {
                     MinecraftServerEvent.Type.SERVER_STOPPED,
                     containerId,
                     containerName,
-                    worldName,
-                    null
+                    worldName
                 )
             );
             completionCallback.run();
