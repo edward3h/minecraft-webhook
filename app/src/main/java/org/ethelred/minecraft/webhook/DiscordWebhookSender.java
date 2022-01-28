@@ -1,10 +1,14 @@
+/* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
+import io.micronaut.context.annotation.Parameter;
+import io.micronaut.context.annotation.Prototype;
 import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import jakarta.inject.Named;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.*;
 import java.net.http.HttpClient;
 import java.util.Optional;
@@ -16,7 +20,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Singleton
+@Prototype
+@Named("discord")
 public class DiscordWebhookSender implements Sender {
 
     private static final long DEFAULT_DELAY = 3_000;
@@ -30,9 +35,9 @@ public class DiscordWebhookSender implements Sender {
     private final BlockingQueue<String> waiting;
 
     @Inject
-    public DiscordWebhookSender(Options options) {
+    public DiscordWebhookSender(@Parameter URL webhookUrl) {
         try {
-            this.webhook = options.getWebhookUrl().toURI();
+            this.webhook = webhookUrl.toURI();
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
@@ -41,7 +46,7 @@ public class DiscordWebhookSender implements Sender {
         this.waiting = new ArrayBlockingQueue<>(64);
         _scheduleNext(0L);
         LOGGER.info(
-            "DiscordWebhookSender initalized with URL {}",
+            "DiscordWebhookSender initialized with URL {}",
             this.webhook
         );
     }
@@ -114,8 +119,7 @@ public class DiscordWebhookSender implements Sender {
             }
         } catch (IOException | InterruptedException e) {
             // can't tell at this point whether the message was sent or not - just give up and log
-            System.err.println("Exception in _sendMessage");
-            e.printStackTrace(System.err);
+            LOGGER.error("Exception in _sendMessage", e);
             delay = DEFAULT_DELAY;
         } finally {
             _scheduleNext(delay);
@@ -136,7 +140,7 @@ public class DiscordWebhookSender implements Sender {
     }
 
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(MinecraftServerEvent event, String message) {
         LOGGER.debug("sendMessage({})", message.trim());
         //noinspection ResultOfMethodCallIgnored
         waiting.offer(message.trim());
