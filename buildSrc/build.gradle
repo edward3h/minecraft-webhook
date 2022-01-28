@@ -7,6 +7,6 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.diffplug.spotless', name: 'spotless-plugin-gradle', version: '6.1.0'
+    implementation group: 'com.diffplug.spotless', name: 'spotless-plugin-gradle', version: '6.2.0'
     implementation group: 'com.github.jakemarsden', name: 'git-hooks-gradle-plugin', version: '0.0.2'
 }
