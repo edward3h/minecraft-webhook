@@ -38,9 +38,9 @@ public class MinecraftServerEventListener
   @Async
   @Override
   public void onApplicationEvent(MinecraftServerEvent event) {
-    if (configuration.getEvents().containsKey(event.getType())) {
+    if (configuration.getEvents().containsKey(event.type())) {
       var substitutor = new StringSubstitutor(_eventLookup(event), "%", "%", '\\');
-      var messageFormat = configuration.getEvents().get(event.getType());
+      var messageFormat = configuration.getEvents().get(event.type());
       var message = substitutor.replace(messageFormat);
       sender.sendMessage(event, message);
     }
