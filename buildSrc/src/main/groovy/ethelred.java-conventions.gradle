@@ -4,6 +4,18 @@ plugins {
 	id "com.github.jakemarsden.git-hooks"
 }
 
+//java {
+//    toolchain {
+//        languageVersion = JavaLanguageVersion.of(17)
+//        vendor = JvmVendorSpec.GRAAL_VM
+//    }
+//}
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+
 spotless {
     format 'misc', {
         target '*.md', '.gitignore'
@@ -14,7 +26,7 @@ spotless {
     java {
         importOrder()
         removeUnusedImports()
-        prettier(['prettier': '2.5.1', 'prettier-plugin-java': '1.6.1']).config(['parser': 'java', 'tabWidth': 4])
+        googleJavaFormat()
         licenseHeader('/* (C) Edward Harman $YEAR */').updateYearWithLatest(true)
     }
     groovyGradle {

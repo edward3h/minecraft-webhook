@@ -14,61 +14,46 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * Lists docker containers to check for new/removed ones. Creates Tailers
- */
+/** Lists docker containers to check for new/removed ones. Creates Tailers */
 @Context
 public class Monitor {
 
-    private static final Logger LOGGER = LogManager.getLogger(Monitor.class);
+  private static final Logger LOGGER = LogManager.getLogger(Monitor.class);
 
-    private final DockerClient docker;
-    private final Collection<String> imageNames;
-    private final Instant startTime;
-    private final ApplicationContext applicationContext;
+  private final DockerClient docker;
+  private final Collection<String> imageNames;
+  private final Instant startTime;
+  private final ApplicationContext applicationContext;
 
-    @Inject
-    public Monitor(
-        ApplicationContext applicationContext,
-        DockerClient docker,
-        Options options
-    ) {
-        this.applicationContext = applicationContext;
-        this.docker = docker;
-        this.imageNames = options.getImageNames();
-        this.startTime = Instant.now();
-        LOGGER.debug("Constructed");
+  @Inject
+  public Monitor(ApplicationContext applicationContext, DockerClient docker, Options options) {
+    this.applicationContext = applicationContext;
+    this.docker = docker;
+    this.imageNames = options.imageNames();
+    this.startTime = Instant.now();
+    LOGGER.debug("Constructed");
+  }
+
+  private final Map<String, Tailer> tails = new ConcurrentHashMap<>();
+
+  @Scheduled(fixedRate = "${mc-webhook.options.monitor.rate:5s}")
+  public void checkForContainers() {
+    LOGGER.debug("Checking for containers");
+    docker.listContainersCmd().withAncestorFilter(imageNames).exec().forEach(this::_checkContainer);
+  }
+
+  private void _checkContainer(Container container) {
+    var containerId = container.getId();
+    if (!tails.containsKey(containerId)) {
+      LOGGER.debug("Adding container {}", container);
+      tails.putIfAbsent(
+          containerId,
+          applicationContext.createBean(
+              Tailer.class, containerId, container.getNames(), onComplete(containerId)));
     }
+  }
 
-    private final Map<String, Tailer> tails = new ConcurrentHashMap<>();
-
-    @Scheduled(fixedRate = "${mc-webhook.options.monitor.rate:5s}")
-    public void checkForContainers() {
-        LOGGER.debug("Checking for containers");
-        docker
-            .listContainersCmd()
-            .withAncestorFilter(imageNames)
-            .exec()
-            .forEach(this::_checkContainer);
-    }
-
-    private void _checkContainer(Container container) {
-        var containerId = container.getId();
-        if (!tails.containsKey(containerId)) {
-            LOGGER.debug("Adding container {}", container);
-            tails.putIfAbsent(
-                containerId,
-                applicationContext.createBean(
-                    Tailer.class,
-                    containerId,
-                    container.getNames(),
-                    onComplete(containerId)
-                )
-            );
-        }
-    }
-
-    private Runnable onComplete(String containerId) {
-        return () -> tails.remove(containerId);
-    }
+  private Runnable onComplete(String containerId) {
+    return () -> tails.remove(containerId);
+  }
 }

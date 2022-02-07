@@ -15,17 +15,16 @@ import java.net.URL;
 @Requires(property = "mc-webhook.webhook-url")
 public class BackCompatUrlSetup extends MinecraftServerEventListener {
 
-    public BackCompatUrlSetup(
-        BeanContext context,
-        ConversionService<?> conversionService,
-        @Property(name = "mc-webhook.webhook-url") URL url
-    ) {
-        super(context, conversionService, getConfiguration(url));
-    }
+  public BackCompatUrlSetup(
+      BeanContext context,
+      ConversionService<?> conversionService,
+      @Property(name = "mc-webhook.webhook-url") URL url) {
+    super(context, conversionService, getConfiguration(url));
+  }
 
-    private static SenderConfiguration getConfiguration(URL url) {
-        var config = new SenderConfiguration();
-        config.setUrl(url); // defaults are ok for other properties
-        return config;
-    }
+  private static SenderConfiguration getConfiguration(URL url) {
+    var config = new SenderConfiguration();
+    config.setUrl(url); // defaults are ok for other properties
+    return config;
+  }
 }

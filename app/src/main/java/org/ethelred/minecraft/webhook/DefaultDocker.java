@@ -11,15 +11,14 @@ import jakarta.inject.Singleton;
 @Factory
 public class DefaultDocker {
 
-    @Singleton
-    public DockerClient docker() {
-        var dockerCC = DefaultDockerClientConfig
-            .createDefaultConfigBuilder()
-            .build();
-        var http = new ApacheDockerHttpClient.Builder()
+  @Singleton
+  public DockerClient docker() {
+    var dockerCC = DefaultDockerClientConfig.createDefaultConfigBuilder().build();
+    var http =
+        new ApacheDockerHttpClient.Builder()
             .dockerHost(dockerCC.getDockerHost())
             .sslConfig(dockerCC.getSSLConfig())
             .build();
-        return DockerClientImpl.getInstance(dockerCC, http);
-    }
+    return DockerClientImpl.getInstance(dockerCC, http);
+  }
 }
