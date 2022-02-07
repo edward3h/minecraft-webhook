@@ -17,22 +17,21 @@ import org.apache.logging.log4j.Logger;
 @Named("json")
 public class JsonSender implements Sender {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+  private static final Logger LOGGER = LogManager.getLogger();
 
-    private final BlockingHttpClient client;
-    private final URI url;
+  private final BlockingHttpClient client;
+  private final URI url;
 
-    public JsonSender(HttpClient client, @Parameter URL url)
-        throws URISyntaxException {
-        this.client = client.toBlocking();
-        this.url = url.toURI();
-    }
+  public JsonSender(HttpClient client, @Parameter URL url) throws URISyntaxException {
+    this.client = client.toBlocking();
+    this.url = url.toURI();
+  }
 
-    @Override
-    public void sendMessage(MinecraftServerEvent event, String message) {
-        LOGGER.debug("Send message {}", event);
-        var request = HttpRequest.POST(url, event);
-        var response = client.exchange(request);
-        LOGGER.debug(response);
-    }
+  @Override
+  public void sendMessage(MinecraftServerEvent event, String message) {
+    LOGGER.debug("Send message {}", event);
+    var request = HttpRequest.POST(url, event);
+    var response = client.exchange(request);
+    LOGGER.debug(response);
+  }
 }
