@@ -19,20 +19,20 @@ public class BackupTailer {
   private static final Pattern backupEvent = Pattern.compile("Backed up as: (\\S+)");
   private final Runnable completionCallback;
   private final ApplicationEventPublisher<BackupEvent> eventPublisher;
-  private final String containerId;
-  private final String containerName;
+  private final Reaper reaper;
 
   @Inject
   public BackupTailer(
       ApplicationEventPublisher<BackupEvent> eventPublisher,
       DockerClient docker,
+      Reaper reaper,
       @Parameter String containerId,
       @Parameter String[] containerNames,
       @Parameter Runnable completionCallback) {
     this.eventPublisher = eventPublisher;
     this.completionCallback = completionCallback;
-    this.containerId = containerId;
-    this.containerName = String.join(",", containerNames);
+    this.reaper = reaper;
+    String containerName = String.join(",", containerNames);
     LOGGER.info("Starting for {}", containerName);
 
     _follow(docker, containerId);
@@ -54,7 +54,9 @@ public class BackupTailer {
       var matcher = backupEvent.matcher(frame.toString());
       if (matcher.find()) {
         var filename = matcher.group(1).trim();
-        eventPublisher.publishEventAsync(new BackupEvent(EventType.BACKUP_COMPLETE, filename));
+        reaper.check(
+            LOGGER,
+            eventPublisher.publishEventAsync(new BackupEvent(EventType.BACKUP_COMPLETE, filename)));
       }
     }
 

@@ -3,6 +3,7 @@ package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Prototype;
+import io.micronaut.context.exceptions.ConfigurationException;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
@@ -23,6 +24,9 @@ public class JsonSender implements Sender {
 
   public JsonSender(HttpClient client, @Parameter SenderConfiguration configuration)
       throws URISyntaxException {
+    if (configuration.url() == null) {
+      throw new ConfigurationException("json sender requires url to be set");
+    }
     this.client = client.toBlocking();
     this.url = configuration.url().toURI();
   }

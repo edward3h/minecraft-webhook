@@ -3,6 +3,7 @@ package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Prototype;
+import io.micronaut.context.exceptions.ConfigurationException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.IOException;
@@ -33,6 +34,9 @@ public class DiscordWebhookSender implements Sender {
 
   @Inject
   public DiscordWebhookSender(@Parameter SenderConfiguration configuration) {
+    if (configuration.url() == null) {
+      throw new ConfigurationException("discord sender requires url to be set");
+    }
     try {
       this.webhook = configuration.url().toURI();
     } catch (URISyntaxException e) {

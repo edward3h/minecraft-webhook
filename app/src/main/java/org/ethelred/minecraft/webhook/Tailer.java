@@ -27,17 +27,20 @@ public class Tailer {
   private final ApplicationEventPublisher<MinecraftServerEvent> eventPublisher;
   private final String containerId;
   private final String containerName;
+  private final Reaper reaper;
   private volatile String worldName = "Unknown";
 
   @Inject
   public Tailer(
       ApplicationEventPublisher<MinecraftServerEvent> eventPublisher,
       DockerClient docker,
+      Reaper reaper,
       @Parameter String containerId,
       @Parameter String[] containerNames,
       @Parameter Runnable completionCallback) {
     this.eventPublisher = eventPublisher;
     this.completionCallback = completionCallback;
+    this.reaper = reaper;
     this.containerId = containerId;
     this.containerName = String.join(",", containerNames);
     LOGGER.info("Tailer is starting for {}", containerName);
@@ -67,9 +70,11 @@ public class Tailer {
       if (matcher.find()) {
         worldName = matcher.group(1).trim();
         LOGGER.debug("Found world name {}", worldName);
-        eventPublisher.publishEventAsync(
-            new MinecraftServerEvent(
-                EventType.SERVER_STARTED, containerId, containerName, worldName));
+        reaper.check(
+            LOGGER,
+            eventPublisher.publishEventAsync(
+                new MinecraftServerEvent(
+                    EventType.SERVER_STARTED, containerId, containerName, worldName)));
       }
     }
   }
@@ -83,22 +88,26 @@ public class Tailer {
         var connect = "connected".equals(matcher.group(1));
         var player = matcher.group(2).trim();
         var xuid = matcher.group(3).trim();
-        eventPublisher.publishEventAsync(
-            new MinecraftPlayerEvent(
-                connect ? EventType.PLAYER_CONNECTED : EventType.PLAYER_DISCONNECTED,
-                containerId,
-                containerName,
-                worldName,
-                player,
-                xuid));
+        reaper.check(
+            LOGGER,
+            eventPublisher.publishEventAsync(
+                new MinecraftPlayerEvent(
+                    connect ? EventType.PLAYER_CONNECTED : EventType.PLAYER_DISCONNECTED,
+                    containerId,
+                    containerName,
+                    worldName,
+                    player,
+                    xuid)));
       }
     }
 
     @Override
     public void onComplete() {
-      eventPublisher.publishEventAsync(
-          new MinecraftServerEvent(
-              EventType.SERVER_STOPPED, containerId, containerName, worldName));
+      reaper.check(
+          LOGGER,
+          eventPublisher.publishEventAsync(
+              new MinecraftServerEvent(
+                  EventType.SERVER_STOPPED, containerId, containerName, worldName)));
       completionCallback.run();
     }
   }
