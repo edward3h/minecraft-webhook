@@ -10,13 +10,18 @@ import java.util.Set;
 /** general options for app */
 @Context // ensure options are validated early
 @ConfigurationProperties("mc-webhook")
-public record Options(@Nullable Set<String> imageNames) {
+public record Options(@Nullable Set<String> imageNames, @Nullable Set<String> backupImageNames) {
 
   private static final Set<String> DEFAULT_IMAGE_NAMES = Set.of("itzg/minecraft-bedrock-server");
+  private static final Set<String> DEFAULT_BACKUP_IMAGE_NAMES =
+      Set.of("kaiede/minecraft-bedrock-backup");
 
   public Options {
     if (imageNames == null || imageNames.isEmpty()) {
       imageNames = new HashSet<>(DEFAULT_IMAGE_NAMES);
+    }
+    if (backupImageNames == null || backupImageNames.isEmpty()) {
+      backupImageNames = new HashSet<>(DEFAULT_BACKUP_IMAGE_NAMES);
     }
   }
 

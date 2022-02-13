@@ -34,7 +34,7 @@ services:
     tty: true
 
   webhook:
-    image: ghcr.io/edward3h/mc-webhook:0.3.2
+    image: ghcr.io/edward3h/mc-webhook:0.4
     restart: "unless-stopped"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

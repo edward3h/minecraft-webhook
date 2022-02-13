@@ -1,0 +1,4 @@
+mqtt:
+  client:
+    client-id: testspec
+    server-uri: tcp://localhost:41883

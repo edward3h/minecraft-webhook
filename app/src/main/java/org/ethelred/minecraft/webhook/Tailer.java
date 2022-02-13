@@ -69,7 +69,7 @@ public class Tailer {
         LOGGER.debug("Found world name {}", worldName);
         eventPublisher.publishEventAsync(
             new MinecraftServerEvent(
-                MinecraftServerEvent.Type.SERVER_STARTED, containerId, containerName, worldName));
+                EventType.SERVER_STARTED, containerId, containerName, worldName));
       }
     }
   }
@@ -84,10 +84,8 @@ public class Tailer {
         var player = matcher.group(2).trim();
         var xuid = matcher.group(3).trim();
         eventPublisher.publishEventAsync(
-            new MinecraftServerEvent(
-                connect
-                    ? MinecraftServerEvent.Type.PLAYER_CONNECTED
-                    : MinecraftServerEvent.Type.PLAYER_DISCONNECTED,
+            new MinecraftPlayerEvent(
+                connect ? EventType.PLAYER_CONNECTED : EventType.PLAYER_DISCONNECTED,
                 containerId,
                 containerName,
                 worldName,
@@ -100,7 +98,7 @@ public class Tailer {
     public void onComplete() {
       eventPublisher.publishEventAsync(
           new MinecraftServerEvent(
-              MinecraftServerEvent.Type.SERVER_STOPPED, containerId, containerName, worldName));
+              EventType.SERVER_STOPPED, containerId, containerName, worldName));
       completionCallback.run();
     }
   }
