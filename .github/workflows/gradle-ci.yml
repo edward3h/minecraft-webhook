@@ -30,4 +30,3 @@ jobs:
       if: always()
       with:
         files: "**/test-results/**/*.xml"
-        
