@@ -7,7 +7,6 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Inject;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.logging.log4j.LogManager;
@@ -20,32 +19,39 @@ public class Monitor {
   private static final Logger LOGGER = LogManager.getLogger(Monitor.class);
 
   private final DockerClient docker;
-  private final Collection<String> imageNames;
   private final ApplicationContext applicationContext;
-  private final Collection<String> backupImageNames;
+  private final Options options;
 
   @Inject
   public Monitor(ApplicationContext applicationContext, DockerClient docker, Options options) {
     this.applicationContext = applicationContext;
     this.docker = docker;
-    this.imageNames = options.imageNames();
-    this.backupImageNames = options.backupImageNames();
-    LOGGER.debug("Constructed");
+    this.options = options;
+    LOGGER.debug("Constructed with {}", options);
   }
 
   private final Map<String, Object> tails = new ConcurrentHashMap<>();
 
   @Scheduled(fixedRate = "${mc-webhook.options.monitor.rate:5s}")
   public void checkForContainers() {
-    LOGGER.debug("Checking for containers");
     docker
         .listContainersCmd()
-        .withAncestorFilter(imageNames)
+        .withAncestorFilter(options.imageNames())
         .exec()
         .forEach(c -> _checkContainer(c, Tailer.class));
     docker
         .listContainersCmd()
-        .withAncestorFilter(backupImageNames)
+        .withAncestorFilter(options.backupImageNames())
+        .exec()
+        .forEach(c -> _checkContainer(c, BackupTailer.class));
+    docker
+        .listContainersCmd()
+        .withLabelFilter(options.imageLabels())
+        .exec()
+        .forEach(c -> _checkContainer(c, Tailer.class));
+    docker
+        .listContainersCmd()
+        .withLabelFilter(options.backupImageLabels())
         .exec()
         .forEach(c -> _checkContainer(c, BackupTailer.class));
   }
@@ -53,7 +59,7 @@ public class Monitor {
   private void _checkContainer(Container container, Class<?> tailerClass) {
     var containerId = container.getId();
     if (!tails.containsKey(containerId)) {
-      LOGGER.debug("Adding container {}", container);
+      LOGGER.debug("Adding container {}", (Object) container.getNames());
       tails.putIfAbsent(
           containerId,
           applicationContext.createBean(
