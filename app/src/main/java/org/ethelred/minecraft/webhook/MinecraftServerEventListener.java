@@ -12,10 +12,13 @@ import io.micronaut.scheduling.annotation.Async;
 import jakarta.inject.Singleton;
 import org.apache.commons.text.StringSubstitutor;
 import org.apache.commons.text.lookup.StringLookup;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Singleton
 @EachBean(SenderConfiguration.class)
 public class MinecraftServerEventListener implements ApplicationEventListener<ServerEvent> {
+  private static final Logger LOGGER = LogManager.getLogger();
 
   private final SenderConfiguration configuration;
   private final Sender sender;
@@ -30,15 +33,18 @@ public class MinecraftServerEventListener implements ApplicationEventListener<Se
     this.sender =
         beanContext.createBean(
             Sender.class, Qualifiers.byName(configuration.type()), configuration);
+    LOGGER.debug("Constructed {}", sender);
   }
 
   @Async
   @Override
   public void onApplicationEvent(ServerEvent event) {
+    LOGGER.debug("on event {}", event);
     if (configuration.events().containsKey(event.getType())) {
       var substitutor = new StringSubstitutor(_eventLookup(event), "%", "%", '\\');
       var messageFormat = configuration.events().get(event.getType());
       var message = substitutor.replace(messageFormat);
+      LOGGER.debug("send message {}", message);
       sender.sendMessage(event, message);
     }
   }

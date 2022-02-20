@@ -54,6 +54,7 @@ public class BackupTailer {
       var matcher = backupEvent.matcher(frame.toString());
       if (matcher.find()) {
         var filename = matcher.group(1).trim();
+        LOGGER.debug("matched {}", filename);
         reaper.check(
             LOGGER,
             eventPublisher.publishEventAsync(new BackupEvent(EventType.BACKUP_COMPLETE, filename)));

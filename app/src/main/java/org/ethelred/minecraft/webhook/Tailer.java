@@ -88,6 +88,7 @@ public class Tailer {
         var connect = "connected".equals(matcher.group(1));
         var player = matcher.group(2).trim();
         var xuid = matcher.group(3).trim();
+        LOGGER.debug("matched {} {}", player, connect);
         reaper.check(
             LOGGER,
             eventPublisher.publishEventAsync(

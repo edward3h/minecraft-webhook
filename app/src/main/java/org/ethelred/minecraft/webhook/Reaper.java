@@ -8,10 +8,12 @@ import jakarta.inject.Singleton;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Singleton
 public class Reaper {
+  private static final Logger LOGGER = LogManager.getLogger();
   private final Executor executor;
 
   @Inject
@@ -23,7 +25,8 @@ public class Reaper {
     executor.execute(
         () -> {
           try {
-            future.get();
+            var r = future.get();
+            LOGGER.debug("Reaped {}", r);
           } catch (ExecutionException | InterruptedException e) {
             logger.error("Task failed", e);
           }
