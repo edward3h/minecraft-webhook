@@ -5,7 +5,8 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 
 @Introspected
-public sealed class MinecraftServerEvent extends ServerEvent permits MinecraftPlayerEvent {
+public sealed class MinecraftServerEvent<X> extends ServerEvent<MinecraftServerEvent<X>>
+    permits MinecraftPlayerEvent {
 
   private final String containerId;
   private final String containerName;

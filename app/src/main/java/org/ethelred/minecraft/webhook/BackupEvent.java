@@ -4,7 +4,7 @@ package org.ethelred.minecraft.webhook;
 import io.micronaut.core.annotation.Introspected;
 
 @Introspected
-public final class BackupEvent extends ServerEvent {
+public final class BackupEvent extends ServerEvent<BackupEvent> {
   private final String filename;
 
   public BackupEvent(EventType type, String filename) {

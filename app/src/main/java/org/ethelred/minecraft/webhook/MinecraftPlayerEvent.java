@@ -1,7 +1,7 @@
 /* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
-public final class MinecraftPlayerEvent extends MinecraftServerEvent {
+public final class MinecraftPlayerEvent extends MinecraftServerEvent<MinecraftPlayerEvent> {
   private final String playerName;
   private final String playerXuid;
 
