@@ -5,6 +5,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.model.Container;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.scheduling.annotation.Scheduled;
 import jakarta.inject.Inject;
 import java.util.Map;
@@ -44,16 +45,20 @@ public class Monitor {
         .withAncestorFilter(options.backupImageNames())
         .exec()
         .forEach(c -> _checkContainer(c, BackupTailer.class));
-    docker
-        .listContainersCmd()
-        .withLabelFilter(options.imageLabels())
-        .exec()
-        .forEach(c -> _checkContainer(c, Tailer.class));
-    docker
-        .listContainersCmd()
-        .withLabelFilter(options.backupImageLabels())
-        .exec()
-        .forEach(c -> _checkContainer(c, BackupTailer.class));
+    if (CollectionUtils.isNotEmpty(options.imageLabels())) {
+      docker
+          .listContainersCmd()
+          .withLabelFilter(options.imageLabels())
+          .exec()
+          .forEach(c -> _checkContainer(c, Tailer.class));
+    }
+    if (CollectionUtils.isNotEmpty(options.backupImageLabels())) {
+      docker
+          .listContainersCmd()
+          .withLabelFilter(options.backupImageLabels())
+          .exec()
+          .forEach(c -> _checkContainer(c, BackupTailer.class));
+    }
   }
 
   private void _checkContainer(Container container, Class<?> tailerClass) {
