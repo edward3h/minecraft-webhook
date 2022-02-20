@@ -63,13 +63,21 @@ public class Tailer {
   }
 
   private class InitialCallback extends ResultCallback.Adapter<Frame> {
+    private volatile boolean foundWorld = false;
 
     @Override
     public void onNext(Frame frame) {
       var matcher = levelName.matcher(frame.toString());
       if (matcher.find()) {
         worldName = matcher.group(1).trim();
+        foundWorld = true;
         LOGGER.debug("Found world name {}", worldName);
+      }
+    }
+
+    @Override
+    public void onComplete() {
+      if (foundWorld) {
         reaper.check(
             LOGGER,
             eventPublisher.publishEventAsync(
