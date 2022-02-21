@@ -2,50 +2,37 @@
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.annotation.EachProperty;
+import io.micronaut.core.annotation.Nullable;
 import java.net.URL;
 import java.util.Map;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @EachProperty("mc-webhook.webhooks")
-public class SenderConfiguration {
+public record SenderConfiguration(
+    @Nullable String type,
+    @Nullable URL url,
+    @Nullable String topic,
+    Map<EventType, String> events) {
 
-  @NotBlank private String type = "discord";
-
-  @NotNull private URL url;
-
-  private Map<MinecraftServerEvent.Type, String> events =
+  public static final String DEFAULT_TYPE = "discord";
+  public static final Map<EventType, String> DEFAULT_EVENTS =
       Map.of(
-          MinecraftServerEvent.Type.SERVER_STARTED,
+          EventType.SERVER_STARTED,
           "World %worldName% starting on %containerName%",
-          MinecraftServerEvent.Type.SERVER_STOPPED,
+          EventType.SERVER_STOPPED,
           "World %worldName% stopping on %containerName%",
-          MinecraftServerEvent.Type.PLAYER_CONNECTED,
+          EventType.PLAYER_CONNECTED,
           "%playerName% connected to %worldName%",
-          MinecraftServerEvent.Type.PLAYER_DISCONNECTED,
-          "%playerName% disconnected from %worldName%");
+          EventType.PLAYER_DISCONNECTED,
+          "%playerName% disconnected from %worldName%",
+          EventType.BACKUP_COMPLETE,
+          "New backup %filename%");
 
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public URL getUrl() {
-    return url;
-  }
-
-  public void setUrl(URL url) {
-    this.url = url;
-  }
-
-  public Map<MinecraftServerEvent.Type, String> getEvents() {
-    return events;
-  }
-
-  public void setEvents(Map<MinecraftServerEvent.Type, String> events) {
-    this.events = events;
+  public SenderConfiguration {
+    if (type == null || type.isBlank()) {
+      type = DEFAULT_TYPE;
+    }
+    if (events.isEmpty()) {
+      events = DEFAULT_EVENTS;
+    }
   }
 }

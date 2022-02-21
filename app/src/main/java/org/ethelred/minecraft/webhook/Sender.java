@@ -1,7 +1,10 @@
 /* (C) Edward Harman 2022 */
 package org.ethelred.minecraft.webhook;
 
-/** I can't believe it's not Consumer */
+/**
+ * I can't believe it's not Consumer In addition to the interface, Sender implementations are
+ * expected to accept an injection @Parameter of type SenderConfiguration
+ */
 public interface Sender {
-  void sendMessage(MinecraftServerEvent event, String message);
+  void sendMessage(ServerEvent event, String message);
 }

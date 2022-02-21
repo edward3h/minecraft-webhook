@@ -3,29 +3,35 @@ package org.ethelred.minecraft.webhook;
 
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 
 @Introspected
-public record MinecraftServerEvent(
-    @NonNull Type type,
-    @NonNull String containerId,
-    @NonNull String containerName,
-    @NonNull String worldName,
-    @Nullable String playerName,
-    @Nullable String playerXuid) {
+public sealed class MinecraftServerEvent<X> extends ServerEvent<MinecraftServerEvent<X>>
+    permits MinecraftPlayerEvent {
+
+  private final String containerId;
+  private final String containerName;
+  private final String worldName;
 
   public MinecraftServerEvent(
-      @NonNull Type type,
+      @NonNull EventType type,
       @NonNull String containerId,
       @NonNull String containerName,
       @NonNull String worldName) {
-    this(type, containerId, containerName, worldName, null, null);
+    super(type);
+    this.containerId = containerId;
+    this.containerName = containerName;
+    this.worldName = worldName;
   }
 
-  enum Type {
-    PLAYER_CONNECTED,
-    PLAYER_DISCONNECTED,
-    SERVER_STARTED,
-    SERVER_STOPPED,
+  public String getContainerId() {
+    return containerId;
+  }
+
+  public String getContainerName() {
+    return containerName;
+  }
+
+  public String getWorldName() {
+    return worldName;
   }
 }

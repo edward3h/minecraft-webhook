@@ -7,6 +7,7 @@ import io.micronaut.context.annotation.Property;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.convert.ConversionService;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * this bean maps the original webhook property into the updated system for backwards compatibility
@@ -23,8 +24,6 @@ public class BackCompatUrlSetup extends MinecraftServerEventListener {
   }
 
   private static SenderConfiguration getConfiguration(URL url) {
-    var config = new SenderConfiguration();
-    config.setUrl(url); // defaults are ok for other properties
-    return config;
+    return new SenderConfiguration(null, url, null, Map.of());
   }
 }

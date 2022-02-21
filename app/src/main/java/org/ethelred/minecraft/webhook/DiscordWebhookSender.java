@@ -3,12 +3,12 @@ package org.ethelred.minecraft.webhook;
 
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.context.annotation.Prototype;
+import io.micronaut.context.exceptions.ConfigurationException;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.*;
 import java.net.http.HttpClient;
 import java.util.Optional;
@@ -33,9 +33,12 @@ public class DiscordWebhookSender implements Sender {
   private final BlockingQueue<String> waiting;
 
   @Inject
-  public DiscordWebhookSender(@Parameter URL webhookUrl) {
+  public DiscordWebhookSender(@Parameter SenderConfiguration configuration) {
+    if (configuration.url() == null) {
+      throw new ConfigurationException("discord sender requires url to be set");
+    }
     try {
-      this.webhook = webhookUrl.toURI();
+      this.webhook = configuration.url().toURI();
     } catch (URISyntaxException e) {
       throw new IllegalArgumentException(e);
     }
@@ -120,7 +123,7 @@ public class DiscordWebhookSender implements Sender {
   }
 
   @Override
-  public void sendMessage(MinecraftServerEvent event, String message) {
+  public void sendMessage(ServerEvent event, String message) {
     LOGGER.debug("sendMessage({})", message.trim());
     //noinspection ResultOfMethodCallIgnored
     waiting.offer(message.trim());
