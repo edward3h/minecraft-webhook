@@ -16,7 +16,7 @@ public class BackupTailer {
 
   private static final Logger LOGGER = LogManager.getLogger();
 
-  private static final Pattern backupEvent = Pattern.compile("Backed up as: (\\S+)");
+  private static final Pattern backupEvent = Pattern.compile("Backed up as: (.+\\.mcworld)$");
   private final Runnable completionCallback;
   private final ApplicationEventPublisher<BackupEvent> eventPublisher;
   private final Reaper reaper;

@@ -24,6 +24,11 @@ class MonitorSpec extends Specification {
     @Shared
     GenericContainer mockBedrock = new GenericContainer(DockerImageName.parse("alpine"))
             .withCommand("/bin/sh", "-c", "while true; do echo \"test\" >> /proc/1/fd/1; sleep 5; done")
+            .withLabel("mc-bedrock", "true")
+    @Shared
+    GenericContainer mockBackup = new GenericContainer(DockerImageName.parse("alpine"))
+            .withCommand("/bin/sh", "-c", "while true; do echo \"test\" >> /proc/1/fd/1; sleep 5; done")
+            .withLabel("mc-backup", "true")
     @Shared
     MockServerClient mockServerClient
 
@@ -33,9 +38,16 @@ class MonitorSpec extends Specification {
         )
     }
 
+    def writeToBackup(String message) {
+        mockBackup.execInContainer(
+                "/bin/sh", "-c", "echo \"$message\" >> /proc/1/fd/1"
+        )
+    }
+
     def setupSpec() {
         mockServer.followOutput({ println(it.getUtf8String().trim()) })
         mockBedrock.followOutput({ println(it.getUtf8String().trim()) })
+        mockBackup.followOutput({println(it.getUtf8String().trim()) })
 
         writeToBedrock("Level Name: MonitorSpec")
         mockServerClient = new MockServerClient(mockServer.host, mockServer.serverPort)
@@ -51,7 +63,8 @@ class MonitorSpec extends Specification {
 
         ApplicationContext applicationContext = ApplicationContext.builder()
                 .properties(
-                        "mc-webhook.image-name": mockBedrock.dockerImageName,
+                        "mc-webhook.image-labels": Set.of("mc-bedrock"),
+                        "mc-webhook.backup-image-labels": Set.of("mc-backup"),
                         "mc-webhook.webhook-url": "http://${mockServer.host}:${mockServer.serverPort}/webhook".toURL(),
                         "mc-webhook.webhooks.discord2.type": "discord",
                         "mc-webhook.webhooks.discord2.url": "http://${mockServer.host}:${mockServer.serverPort}/webhookmsg".toURL(),
@@ -67,7 +80,7 @@ class MonitorSpec extends Specification {
     def "player connected"() {
         when:
         writeToBedrock("Player connected: Bob, xuid: 12345")
-        println mockServerClient.retrieveRecordedRequests(null)
+//        println mockServerClient.retrieveRecordedRequests(null)
 
         then:
         mockServerClient.verify(
@@ -86,4 +99,18 @@ class MonitorSpec extends Specification {
                       "containerName" : "${mockBedrock.containerName}"
                     }""", MatchType.ONLY_MATCHING_FIELDS)), VerificationTimes.atLeast(1))
     }
+
+    @Retry(delay = 1000, count = 3)
+    def "backup complete with space in filename"() {
+        when:
+        writeToBackup("[23:00:03.062][info    ] Backed up as: Hardcore FC.20220312-230000.mcworld")
+
+        then:
+        mockServerClient.verify(
+                request().withMethod("POST").withPath("/webhookjson")
+                        .withBody(json("""{
+                      "filename" : "Hardcore FC.20220312-230000.mcworld"
+                    }""", MatchType.ONLY_MATCHING_FIELDS)), VerificationTimes.atLeast(1))
+    }
+
 }
