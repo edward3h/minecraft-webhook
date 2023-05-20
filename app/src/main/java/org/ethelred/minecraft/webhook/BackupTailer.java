@@ -1,4 +1,4 @@
-/* (C) Edward Harman 2022 */
+/* (C) Edward Harman 2022-2023 */
 package org.ethelred.minecraft.webhook;
 
 import com.github.dockerjava.api.DockerClient;
@@ -16,7 +16,7 @@ public class BackupTailer {
 
   private static final Logger LOGGER = LogManager.getLogger();
 
-  private static final Pattern backupEvent = Pattern.compile("Backed up as: (.+\\.mcworld)$");
+  private static final Pattern backupEvent = Pattern.compile("Backed up as: (.+\\.mcworld)");
   private final Runnable completionCallback;
   private final ApplicationEventPublisher<BackupEvent> eventPublisher;
   private final Reaper reaper;

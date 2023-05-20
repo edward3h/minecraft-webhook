@@ -1,4 +1,4 @@
-/* (C) Edward Harman 2022 */
+/* (C) Edward Harman 2022-2023 */
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.runtime.Micronaut;
