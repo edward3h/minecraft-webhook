@@ -39,7 +39,7 @@ dependencies {
 	implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
 	implementation 'org.apache.commons:commons-text:1.9'
 
-	runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.18.0'
+	runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.20.0'
 	runtimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
 	runtimeOnly 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 
