@@ -26,7 +26,7 @@ micronaut {
 
 dependencies {
 	implementation group: 'com.github.docker-java', name: 'docker-java-core', version: '3.3.0'
-	implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.2.13'
+	implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.3.0'
 	annotationProcessor("io.micronaut:micronaut-http-validation")
 	implementation("io.micronaut:micronaut-http-client")
 	implementation("io.micronaut:micronaut-runtime")
