@@ -2,26 +2,26 @@
 package org.ethelred.minecraft.webhook;
 
 public final class MinecraftPlayerEvent extends MinecraftServerEvent<MinecraftPlayerEvent> {
-  private final String playerName;
-  private final String playerXuid;
+    private final String playerName;
+    private final String playerXuid;
 
-  public MinecraftPlayerEvent(
-      EventType type,
-      String containerId,
-      String containerName,
-      String worldName,
-      String playerName,
-      String playerXuid) {
-    super(type, containerId, containerName, worldName);
-    this.playerName = playerName;
-    this.playerXuid = playerXuid;
-  }
+    public MinecraftPlayerEvent(
+            EventType type,
+            String containerId,
+            String containerName,
+            String worldName,
+            String playerName,
+            String playerXuid) {
+        super(type, containerId, containerName, worldName);
+        this.playerName = playerName;
+        this.playerXuid = playerXuid;
+    }
 
-  public String getPlayerName() {
-    return playerName;
-  }
+    public String getPlayerName() {
+        return playerName;
+    }
 
-  public String getPlayerXuid() {
-    return playerXuid;
-  }
+    public String getPlayerXuid() {
+        return playerXuid;
+    }
 }

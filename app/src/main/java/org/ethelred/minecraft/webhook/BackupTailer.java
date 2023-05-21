@@ -14,59 +14,57 @@ import org.apache.logging.log4j.Logger;
 /** tail container logs */
 public class BackupTailer {
 
-  private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-  private static final Pattern backupEvent = Pattern.compile("Backed up as: (.+\\.mcworld)");
-  private final Runnable completionCallback;
-  private final ApplicationEventPublisher<BackupEvent> eventPublisher;
-  private final Reaper reaper;
+    private static final Pattern backupEvent = Pattern.compile("Backed up as: (.+\\.mcworld)");
+    private final Runnable completionCallback;
+    private final ApplicationEventPublisher<BackupEvent> eventPublisher;
+    private final Reaper reaper;
 
-  @Inject
-  public BackupTailer(
-      ApplicationEventPublisher<BackupEvent> eventPublisher,
-      DockerClient docker,
-      Reaper reaper,
-      @Parameter String containerId,
-      @Parameter String[] containerNames,
-      @Parameter Runnable completionCallback) {
-    this.eventPublisher = eventPublisher;
-    this.completionCallback = completionCallback;
-    this.reaper = reaper;
-    String containerName = String.join(",", containerNames);
-    LOGGER.info("Starting for {}", containerName);
+    @Inject
+    public BackupTailer(
+            ApplicationEventPublisher<BackupEvent> eventPublisher,
+            DockerClient docker,
+            Reaper reaper,
+            @Parameter String containerId,
+            @Parameter String[] containerNames,
+            @Parameter Runnable completionCallback) {
+        this.eventPublisher = eventPublisher;
+        this.completionCallback = completionCallback;
+        this.reaper = reaper;
+        String containerName = String.join(",", containerNames);
+        LOGGER.info("Starting for {}", containerName);
 
-    _follow(docker, containerId);
-  }
-
-  private void _follow(DockerClient docker, String containerId) {
-    docker
-        .logContainerCmd(containerId)
-        .withStdOut(true)
-        .withTail(0)
-        .withFollowStream(true)
-        .exec(new FollowCallback());
-  }
-
-  private class FollowCallback extends ResultCallback.Adapter<Frame> {
-
-    @Override
-    public void onNext(Frame frame) {
-      var line = frame.toString();
-      var matcher = backupEvent.matcher(line);
-      if (matcher.find()) {
-        var filename = matcher.group(1).trim();
-        LOGGER.debug("matched {}", filename);
-        reaper.check(
-            LOGGER,
-            eventPublisher.publishEventAsync(new BackupEvent(EventType.BACKUP_COMPLETE, filename)));
-      } else {
-        LOGGER.trace("unmatched {}", line);
-      }
+        _follow(docker, containerId);
     }
 
-    @Override
-    public void onComplete() {
-      completionCallback.run();
+    private void _follow(DockerClient docker, String containerId) {
+        docker.logContainerCmd(containerId)
+                .withStdOut(true)
+                .withTail(0)
+                .withFollowStream(true)
+                .exec(new FollowCallback());
     }
-  }
+
+    private class FollowCallback extends ResultCallback.Adapter<Frame> {
+
+        @Override
+        public void onNext(Frame frame) {
+            var line = frame.toString();
+            var matcher = backupEvent.matcher(line);
+            if (matcher.find()) {
+                var filename = matcher.group(1).trim();
+                LOGGER.debug("matched {}", filename);
+                reaper.check(
+                        LOGGER, eventPublisher.publishEventAsync(new BackupEvent(EventType.BACKUP_COMPLETE, filename)));
+            } else {
+                LOGGER.trace("unmatched {}", line);
+            }
+        }
+
+        @Override
+        public void onComplete() {
+            completionCallback.run();
+        }
+    }
 }

@@ -10,20 +10,20 @@ import org.apache.logging.log4j.Logger;
 @Prototype
 @Named("mqtt")
 public class MqttSender implements Sender {
-  private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-  private final MqttClient client;
-  private final String topic;
+    private final MqttClient client;
+    private final String topic;
 
-  public MqttSender(MqttClient client, @Parameter SenderConfiguration configuration) {
-    this.client = client;
-    this.topic = configuration.topic();
-    LOGGER.debug("Constructed {} {}", client, topic);
-  }
+    public MqttSender(MqttClient client, @Parameter SenderConfiguration configuration) {
+        this.client = client;
+        this.topic = configuration.topic();
+        LOGGER.debug("Constructed {} {}", client, topic);
+    }
 
-  @Override
-  public void sendMessage(ServerEvent event, String message) {
-    LOGGER.debug("sendMessage {} {}", topic, event);
-    client.sendEvent(topic, event);
-  }
+    @Override
+    public void sendMessage(ServerEvent event, String message) {
+        LOGGER.debug("sendMessage {} {}", topic, event);
+        client.sendEvent(topic, event);
+    }
 }

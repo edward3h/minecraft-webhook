@@ -13,23 +13,22 @@ import org.apache.logging.log4j.Logger;
 
 @Singleton
 public class Reaper {
-  private static final Logger LOGGER = LogManager.getLogger();
-  private final Executor executor;
+    private static final Logger LOGGER = LogManager.getLogger();
+    private final Executor executor;
 
-  @Inject
-  public Reaper(@Named(TaskExecutors.SCHEDULED) Executor executor) {
-    this.executor = executor;
-  }
+    @Inject
+    public Reaper(@Named(TaskExecutors.SCHEDULED) Executor executor) {
+        this.executor = executor;
+    }
 
-  public void check(Logger logger, Future<?> future) {
-    executor.execute(
-        () -> {
-          try {
-            var r = future.get();
-            LOGGER.debug("Reaped {}", r);
-          } catch (ExecutionException | InterruptedException e) {
-            logger.error("Task failed", e);
-          }
+    public void check(Logger logger, Future<?> future) {
+        executor.execute(() -> {
+            try {
+                var r = future.get();
+                LOGGER.debug("Reaped {}", r);
+            } catch (ExecutionException | InterruptedException e) {
+                logger.error("Task failed", e);
+            }
         });
-  }
+    }
 }

@@ -11,8 +11,8 @@ plugins {
 //    }
 //}
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-    targetCompatibility = JavaVersion.toVersion("17")
+    sourceCompatibility = JavaVersion.toVersion("19")
+    targetCompatibility = JavaVersion.toVersion("19")
 }
 
 
@@ -26,7 +26,7 @@ spotless {
     java {
         importOrder()
         removeUnusedImports()
-        googleJavaFormat()
+        palantirJavaFormat()
         licenseHeader('/* (C) Edward Harman $YEAR */').updateYearWithLatest(true)
     }
     groovyGradle {

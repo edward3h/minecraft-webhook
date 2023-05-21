@@ -18,44 +18,39 @@ import org.apache.logging.log4j.Logger;
 @Singleton
 @EachBean(SenderConfiguration.class)
 public class MinecraftServerEventListener implements ApplicationEventListener<ServerEvent> {
-  private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-  private final SenderConfiguration configuration;
-  private final Sender sender;
-  private final ConversionService<?> conversionService;
+    private final SenderConfiguration configuration;
+    private final Sender sender;
+    private final ConversionService<?> conversionService;
 
-  public MinecraftServerEventListener(
-      BeanContext beanContext,
-      ConversionService<?> conversionService,
-      SenderConfiguration configuration) {
-    this.conversionService = conversionService;
-    this.configuration = configuration;
-    this.sender =
-        beanContext.createBean(
-            Sender.class, Qualifiers.byName(configuration.type()), configuration);
-    LOGGER.debug("Constructed {}", sender);
-  }
-
-  @Async
-  @Override
-  public void onApplicationEvent(ServerEvent event) {
-    LOGGER.debug("on event {}", event);
-    if (configuration.events().containsKey(event.getType())) {
-      var substitutor = new StringSubstitutor(_eventLookup(event), "%", "%", '\\');
-      var messageFormat = configuration.events().get(event.getType());
-      var message = substitutor.replace(messageFormat);
-      LOGGER.debug("send message {}", message);
-      sender.sendMessage(event, message);
+    public MinecraftServerEventListener(
+            BeanContext beanContext, ConversionService<?> conversionService, SenderConfiguration configuration) {
+        this.conversionService = conversionService;
+        this.configuration = configuration;
+        this.sender = beanContext.createBean(Sender.class, Qualifiers.byName(configuration.type()), configuration);
+        LOGGER.debug("Constructed {}", sender);
     }
-  }
 
-  private StringLookup _eventLookup(ServerEvent event) {
-    return key -> {
-      var property = BeanIntrospection.getIntrospection(event.getClass()).getProperty(key);
-      return property
-          .map((BeanProperty p) -> p.get(event))
-          .flatMap(o -> conversionService.convert(o, String.class))
-          .orElse(null);
-    };
-  }
+    @Async
+    @Override
+    public void onApplicationEvent(ServerEvent event) {
+        LOGGER.debug("on event {}", event);
+        if (configuration.events().containsKey(event.getType())) {
+            var substitutor = new StringSubstitutor(_eventLookup(event), "%", "%", '\\');
+            var messageFormat = configuration.events().get(event.getType());
+            var message = substitutor.replace(messageFormat);
+            LOGGER.debug("send message {}", message);
+            sender.sendMessage(event, message);
+        }
+    }
+
+    private StringLookup _eventLookup(ServerEvent event) {
+        return key -> {
+            var property = BeanIntrospection.getIntrospection(event.getClass()).getProperty(key);
+            return property.map((BeanProperty p) -> p.get(event))
+                    .flatMap(o -> conversionService.convert(o, String.class))
+                    .orElse(null);
+        };
+    }
 }

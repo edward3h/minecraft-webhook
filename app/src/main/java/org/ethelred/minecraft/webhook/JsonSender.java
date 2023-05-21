@@ -17,25 +17,24 @@ import org.apache.logging.log4j.Logger;
 @Named("json")
 public class JsonSender implements Sender {
 
-  private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-  private final BlockingHttpClient client;
-  private final URI url;
+    private final BlockingHttpClient client;
+    private final URI url;
 
-  public JsonSender(HttpClient client, @Parameter SenderConfiguration configuration)
-      throws URISyntaxException {
-    if (configuration.url() == null) {
-      throw new ConfigurationException("json sender requires url to be set");
+    public JsonSender(HttpClient client, @Parameter SenderConfiguration configuration) throws URISyntaxException {
+        if (configuration.url() == null) {
+            throw new ConfigurationException("json sender requires url to be set");
+        }
+        this.client = client.toBlocking();
+        this.url = configuration.url().toURI();
     }
-    this.client = client.toBlocking();
-    this.url = configuration.url().toURI();
-  }
 
-  @Override
-  public void sendMessage(ServerEvent event, String message) {
-    LOGGER.debug("Send message {}", event);
-    var request = HttpRequest.POST(url, event);
-    var response = client.exchange(request);
-    LOGGER.debug(response);
-  }
+    @Override
+    public void sendMessage(ServerEvent event, String message) {
+        LOGGER.debug("Send message {}", event);
+        var request = HttpRequest.POST(url, event);
+        var response = client.exchange(request);
+        LOGGER.debug(response);
+    }
 }

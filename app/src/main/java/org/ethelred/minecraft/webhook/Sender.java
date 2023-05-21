@@ -6,5 +6,5 @@ package org.ethelred.minecraft.webhook;
  * expected to accept an injection @Parameter of type SenderConfiguration
  */
 public interface Sender {
-  void sendMessage(ServerEvent event, String message);
+    void sendMessage(ServerEvent event, String message);
 }

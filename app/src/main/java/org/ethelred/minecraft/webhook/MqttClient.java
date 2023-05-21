@@ -6,5 +6,5 @@ import io.micronaut.mqtt.v5.annotation.MqttPublisher;
 
 @MqttPublisher
 public interface MqttClient {
-  void sendEvent(@Topic String topic, ServerEvent event);
+    void sendEvent(@Topic String topic, ServerEvent event);
 }
