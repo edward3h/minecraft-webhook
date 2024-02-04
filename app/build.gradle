@@ -6,7 +6,7 @@ plugins {
 	// Apply the groovy plugin to also add support for Groovy (needed for Spock)
 	id 'groovy'
 
-	id("com.github.johnrengelman.shadow") version "7.1.2"
+	id("com.github.johnrengelman.shadow") version "8.1.1"
 	id("io.micronaut.application") version "3.7.9"
 }
 
