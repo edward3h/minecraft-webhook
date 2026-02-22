@@ -25,12 +25,14 @@ micronaut {
 }
 
 dependencies {
-	implementation group: 'com.github.docker-java', name: 'docker-java-core', version: '3.3.0'
-	implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.3.0'
+	implementation group: 'com.github.docker-java', name: 'docker-java-core', version: '3.7.0'
+	implementation 'com.github.docker-java:docker-java-transport-httpclient5:3.7.0'
 	annotationProcessor("io.micronaut:micronaut-http-validation")
 	annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
 	implementation("io.micronaut:micronaut-http-client")
 	implementation("io.micronaut.mqtt:micronaut-mqttv5")
+	implementation("io.micronaut:micronaut-jackson-databind")
+
 	implementation 'jakarta.inject:jakarta.inject-api'
 
 	implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
@@ -42,6 +44,7 @@ dependencies {
 
 	runtimeOnly 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.13.3'
 
+	testImplementation(platform("org.testcontainers:testcontainers-bom:1.21.3"))
 	testImplementation 'org.testcontainers:testcontainers:1.17.3'
 	testImplementation "org.testcontainers:spock:1.17.3"
 	testImplementation "org.testcontainers:mockserver:1.17.3"
