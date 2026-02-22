@@ -4,3 +4,19 @@ buildscript {
         mavenCentral()
     }
 }
+
+plugins {
+    id("org.openrewrite.rewrite").version("latest.release")
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    rewrite("org.openrewrite.recipe:rewrite-micronaut:2.24.0")
+}
+
+rewrite {
+    activeRecipe("org.openrewrite.java.micronaut.Micronaut3to4Migration")
+}
