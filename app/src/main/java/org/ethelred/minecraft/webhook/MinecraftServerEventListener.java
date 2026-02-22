@@ -22,11 +22,11 @@ public class MinecraftServerEventListener implements ApplicationEventListener<Se
 
   private final SenderConfiguration configuration;
   private final Sender sender;
-  private final ConversionService<?> conversionService;
+  private final ConversionService conversionService;
 
   public MinecraftServerEventListener(
       BeanContext beanContext,
-      ConversionService<?> conversionService,
+      ConversionService conversionService,
       SenderConfiguration configuration) {
     this.conversionService = conversionService;
     this.configuration = configuration;

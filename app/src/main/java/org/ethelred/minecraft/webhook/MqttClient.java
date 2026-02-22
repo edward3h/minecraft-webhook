@@ -2,7 +2,7 @@
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.mqtt.annotation.Topic;
-import io.micronaut.mqtt.v5.annotation.MqttPublisher;
+import io.micronaut.mqtt.annotation.v5.MqttPublisher;
 
 @MqttPublisher
 public interface MqttClient {

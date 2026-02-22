@@ -18,7 +18,7 @@ public class BackCompatUrlSetup extends MinecraftServerEventListener {
 
   public BackCompatUrlSetup(
       BeanContext context,
-      ConversionService<?> conversionService,
+      ConversionService conversionService,
       @Property(name = "mc-webhook.webhook-url") URL url) {
     super(context, conversionService, getConfiguration(url));
   }
