@@ -1,4 +1,4 @@
-/* (C) Edward Harman 2022-2023 */
+/* (C) Edward Harman 2022-2026 */
 package org.ethelred.minecraft.webhook;
 
 import io.micronaut.scheduling.TaskExecutors;
