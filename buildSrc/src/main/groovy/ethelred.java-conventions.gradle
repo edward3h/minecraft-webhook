@@ -4,15 +4,13 @@ plugins {
 	id "com.github.jakemarsden.git-hooks"
 }
 
-//java {
-//    toolchain {
-//        languageVersion = JavaLanguageVersion.of(17)
-//        vendor = JvmVendorSpec.GRAAL_VM
-//    }
-//}
 java {
-    sourceCompatibility = JavaVersion.toVersion("17")
-    targetCompatibility = JavaVersion.toVersion("17")
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+//        vendor = JvmVendorSpec.GRAAL_VM
+    }
+    sourceCompatibility = JavaVersion.toVersion("25")
+    targetCompatibility = JavaVersion.toVersion("25")
 }
 
 
