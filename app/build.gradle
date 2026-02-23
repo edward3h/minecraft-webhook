@@ -49,7 +49,7 @@ dependencies {
 	testImplementation "org.testcontainers:spock:1.17.3"
 	testImplementation "org.testcontainers:mockserver:1.17.3"
 	testImplementation 'org.mock-server:mockserver-client-java:5.12.0'
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+	testImplementation 'org.junit.jupiter:junit-jupiter-api:6.0.3'
 }
 
 compileJava {
