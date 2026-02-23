@@ -1,22 +1,20 @@
 plugins {
-	id 'java'
-	id "com.diffplug.spotless"
-	id "com.github.jakemarsden.git-hooks"
+    java
+    id("com.diffplug.spotless")
+    id("com.github.jakemarsden.git-hooks")
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
-//        vendor = JvmVendorSpec.GRAAL_VM
     }
     sourceCompatibility = JavaVersion.toVersion("25")
     targetCompatibility = JavaVersion.toVersion("25")
 }
 
-
 spotless {
-    format 'misc', {
-        target '*.md', '.gitignore'
+    format("misc") {
+        target("*.md", ".gitignore")
         trimTrailingWhitespace()
         indentWithSpaces()
         endWithNewline()
@@ -25,14 +23,14 @@ spotless {
         importOrder()
         removeUnusedImports()
         googleJavaFormat()
-        licenseHeader('/* (C) Edward Harman $YEAR */').updateYearWithLatest(true)
+        licenseHeader("/* (C) Edward Harman \$YEAR */").updateYearWithLatest(true)
     }
-    groovyGradle {
-        greclipse()
+    kotlinGradle {
+        ktlint()
     }
 }
 
 gitHooks {
-	hooks = ['pre-commit': 'check']
+    hooks = mapOf("pre-commit" to "check")
     hooksDirectory = file("${project.rootDir}/.git/hooks")
 }
