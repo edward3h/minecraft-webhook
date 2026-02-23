@@ -37,8 +37,8 @@ dependencies {
     runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.1")
     testImplementation(platform("org.testcontainers:testcontainers-bom:2.0.3"))
     testImplementation("org.testcontainers:testcontainers:2.0.3")
-    testImplementation("org.testcontainers:spock:1.17.3")
-    testImplementation("org.testcontainers:mockserver:1.17.3")
+    testImplementation("org.testcontainers:spock:1.21.4")
+    testImplementation("org.testcontainers:mockserver:1.21.4")
     testImplementation("org.mock-server:mockserver-client-java:5.12.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.3")
 }
