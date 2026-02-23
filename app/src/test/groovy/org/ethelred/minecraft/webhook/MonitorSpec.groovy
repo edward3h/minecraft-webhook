@@ -20,7 +20,7 @@ import static org.mockserver.model.JsonBody.json
 class MonitorSpec extends Specification {
 
     @Shared
-    MockServerContainer mockServer = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:mockserver-5.12.0"))
+    MockServerContainer mockServer = new MockServerContainer(DockerImageName.parse("mockserver/mockserver:mockserver-5.15.0"))
     @Shared
     GenericContainer mockBedrock = new GenericContainer(DockerImageName.parse("alpine"))
             .withCommand("/bin/sh", "-c", "while true; do echo \"test\" >> /proc/1/fd/1; sleep 5; done")
