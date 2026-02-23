@@ -11,3 +11,4 @@ bin
 .project
 .settings/org.eclipse.buildship.core.prefs
 app/.settings/org.eclipse.buildship.core.prefs
+/.serena/cache
