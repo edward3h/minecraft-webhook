@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    rewrite("org.openrewrite.recipe:rewrite-micronaut:2.24.0")
+    rewrite("org.openrewrite.recipe:rewrite-micronaut:2.31.2")
 }
 
 rewrite {
