@@ -1,7 +1,7 @@
 plugins {
     id("ethelred.java-conventions")
     id("groovy")
-    id("com.gradleup.shadow") version "9.3.1"
+    id("com.gradleup.shadow") version "9.3.2"
     id("io.micronaut.application") version "4.6.2"
 }
 
