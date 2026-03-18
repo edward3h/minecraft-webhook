@@ -22,7 +22,7 @@ micronaut {
 
 dependencies {
     implementation("com.github.docker-java:docker-java-core:3.7.0")
-    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.7.0")
+    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.7.1")
     annotationProcessor("io.micronaut:micronaut-http-validation")
     annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
     implementation("io.micronaut:micronaut-http-client")
