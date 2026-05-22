@@ -40,7 +40,7 @@ dependencies {
     testImplementation("org.testcontainers:spock:1.21.4")
     testImplementation("org.testcontainers:mockserver:1.21.4")
     testImplementation("org.mock-server:mockserver-client-java:5.15.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.1.0")
 }
 
 tasks.named<JavaCompile>("compileJava") {
